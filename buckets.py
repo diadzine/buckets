@@ -34,37 +34,56 @@ class Manager:
         """
         Return next state and pop it off the queue.
         """
-        # TODO: return a state from the queue if it exists
-        pass
+        if not self.queue:
+            return None
+
+        state = self.queue[0]
+        self.queue = self.queue[1:]
+        return state
 
     def addState(self, parentState, newState):
         """
         Add state if it's new. Remember its parent
         """
-        # TODO: add a state to the queue and seen states
-        pass
+        if str(newState) in self.seen:
+            return
+
+        self.seen[str(newState)] = str(parentState)
+        self.queue.append(newState)
 
     def getSolution(self):
         """
         Return solution from latest state added.
         """
-        # TODO: return all states required for the solution
-        pass
+        solution = []
+        state = self.queue[-1]
+
+        while state:
+            solution.append(str(state))
+            state = self.getParent(state)
+
+        solution.reverse()
+        return solution
 
     def getParent(self, childState):
         """
         Return parent of state, if it exists.
         """
-        # TODO: return parent if it exists
-        pass
+        try:
+            return self.seen[str(childState)]
+        except:
+            return None
+
 
 class BucketPlayer:
     def __init__(self, manager):
         self.manager = manager
 
     def test(self, oldstate, newstate):
-        # TODO: implement
-        pass
+        [newA, newB] = newstate
+        won = (newA == self.goal or newB == self.goal)
+        self.manager.addState(oldstate, newstate)
+        return won
 
     def playGame(self, aMax, bMax, goal):
         """
@@ -74,8 +93,30 @@ class BucketPlayer:
         self.manager.addState("", [0, 0])   # start with 2 empty buckets
 
         while 1:
-            # TODO: player actions
-            break
+            oldstate = self.manager.getState()
+            [aHas, bHas] = oldstate
+
+            if self.test(oldstate, [aMax, bHas]):
+                break  # fill A from well
+
+            if self.test(oldstate, [0, bHas]):
+                break  # empty A to well
+
+            if self.test(oldstate, [aHas, bMax]):
+                break  # fill B from well
+
+            if self.test(oldstate, [aHas, 0]):
+                break  # empty B to well
+
+            howmuch = min(aHas, bMax-bHas)
+
+            if self.test(oldstate, [aHas-howmuch, bHas+howmuch]):
+                break  # pour A to B
+
+            howmuch = min(bHas, aMax-aHas)
+
+            if self.test(oldstate, [aHas+howmuch, bHas-howmuch]):
+                break  # pour B to A
 
         print ("Solution is ")
         print ("\n".join(self.manager.getSolution()))
