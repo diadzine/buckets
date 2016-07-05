@@ -36,9 +36,9 @@ class Manager:
         """
         if not self.queue:
             return None
-        nextState, self.queue = self.queue[0], self.queue[1:]
+        state, self.queue = self.queue[0], self.queue[1:]
 
-        return nextState
+        return state
 
     def addState(self, parentState, newState):
         """
@@ -70,6 +70,7 @@ class Manager:
         except KeyError:
             return None
 
+
 class BucketPlayer:
     def __init__(self, manager):
         self.manager = manager
@@ -87,15 +88,22 @@ class BucketPlayer:
 
         while 1:
             oldstate = self.manager.getState()
-            aHas , bHas = oldstate
+            aHas, bHas = oldstate
 
-            if self.test(oldstate, [aMax, bHas]) or self.test(oldstate, [aHas, bMax]) or self.test(oldstate, [0, bHas]) or self.test(oldstate, [aHas, 0])
+            if (self.test(oldstate, [aMax, bHas]) or
+                    self.test(oldstate, [aHas, bMax]) or
+                    self.test(oldstate, [0, bHas]) or
+                    self.test(oldstate, [aHas, 0])):
                 break
+
             howmuch = min(aHas, bMax - bHas)
-            if self.test(oldstate, [aHas - howmuch, bHas + howmuch])
+
+            if self.test(oldstate, [aHas - howmuch, bHas + howmuch]):
                 break
+
             howmuch = min(bHas, aMax - aHas)
-            if self.test(oldstate, [aHas + howmuch, bHas - howmuch])
+
+            if self.test(oldstate, [aHas + howmuch, bHas - howmuch]):
                 break
 
         print ("Solution is ")
